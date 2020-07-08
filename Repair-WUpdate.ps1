@@ -3,7 +3,6 @@
         $env = Get-ChildItem -Path Env:\
         $systemroot= $env:SystemRoot #$env | where Name -eq "SystemRoot" | select Value
         
-        Receive-Job $(Start-Job {
             $bits = Get-Service -Name "bits"
             if($bits.Status -eq [System.ServiceProcess.ServiceControllerStatus]::Running) { $bits.Stop(); $bits.WaitForStatus([System.ServiceProcess.ServiceControllerStatus]::Stopped); }
         
@@ -21,8 +20,8 @@
                 Remove-Item -Path "$($env:SystemRoot)\SoftwareDistribution.bak" -Recurse -Force
             }
 
-            if($(Test-Path -Path "$($env:SystemRoot)\System32\catroo2.bak")) { 
-                Remove-Item -Path "$($env:SystemRoot)\System32\catroo2.bak" -Recurse -Force
+            if($(Test-Path -Path "$($env:SystemRoot)\System32\catroot2.bak")) { 
+                Remove-Item -Path "$($env:SystemRoot)\System32\catroot2.bak" -Recurse -Force
             }
 
             Rename-Item -Path "$($env:SystemRoot)\SoftwareDistribution" -NewName SoftwareDistribution.bak -Force
@@ -33,4 +32,6 @@
             $wuauserv.Start()
             $cryptSvc.Start()
             $msiserver.Start()        
-        })
+
+        DISM.exe /Online /Cleanup-image /Restorehealth 
+    }
